@@ -25,7 +25,7 @@ namespace JAI
             {
                 // Convert the past time as points. Add those.
                 var elapsed = record - lastCalculatingPoint;
-                var points = GetPoints(elapsed);
+                var points = GetPointsFromWaitingTime(elapsed);
                 totalPoints = AddScore(totalPoints, points);
 
                 // Since this is a triggered event. Count it!
@@ -39,12 +39,13 @@ namespace JAI
             }
 
             var finalElapsed = DateTime.Now - lastCalculatingPoint;
-            var pointsLast = GetPoints(finalElapsed);
+            var pointsLast = GetPointsFromWaitingTime(finalElapsed);
             totalPoints = AddScore(totalPoints, pointsLast);
             Console.WriteLine($"...");
             Console.WriteLine($"...");
             var feels = GetStatus(totalPoints);
-            Console.WriteLine($"Your current point is: {totalPoints:N1}. Feels {feels}..");
+            Console.WriteLine($"Your current point is:    {totalPoints:N1}.    Feels {feels}..");
+            Console.WriteLine($"Suggestion: {GetSuggestions(totalPoints)}\n");
             Console.WriteLine($"Press [A] to add a record... Press [N] to quit.");
             var key = Console.ReadKey().Key.ToString().ToLower().Trim();
             if (key == "a")
@@ -57,7 +58,7 @@ namespace JAI
             await File.WriteAllTextAsync(database, newJson);
         }
 
-        static double GetPoints(TimeSpan input)
+        static double GetPointsFromWaitingTime(TimeSpan input)
         {
             var x = input.TotalDays;
             var points = 0.0;
@@ -73,14 +74,14 @@ namespace JAI
             return points;
         }
 
-        static double WastePoint(double source)
+        static double WastePoint(double sourceWastedBefore)
         {
-            return source / 2.0 - 5;
+            return sourceWastedBefore / 2.0 - 5;
         }
 
-        static double AddScore(double source, double target)
+        static double AddScore(double sourceScore, double scoreToAdd)
         {
-            return Math.Min(100, source + target);
+            return Math.Min(100, sourceScore + scoreToAdd);
         }
 
         static string GetStatus(double score)
@@ -105,6 +106,22 @@ namespace JAI
                 return "shit";
             else if (score >= 0)
                 return "about to die...";
+            else
+                throw new InvalidOperationException();
+        }
+
+        static string GetSuggestions(double currentScore)
+        {
+            if (currentScore >= 90)
+                return "You should have some happiness.";
+            else if (currentScore >= 70)
+                return "You can have some happiness.";
+            else if (currentScore >= 50)
+                return "You'd better not. Experience is not so good.";
+            else if (currentScore >= 30)
+                return "Please don't!! Your body is in a real bad status!";
+            else if (currentScore >= 0)
+                return "Please DO NOT HURT YOUR BODY!!! You WILL get injured and feel extreamly unconfortable if you insists.";
             else
                 throw new InvalidOperationException();
         }
