@@ -46,6 +46,15 @@ namespace JAI
             var feels = GetStatus(totalPoints);
             Console.WriteLine($"Your current point is:    {totalPoints:N1}.    Feels {feels}..");
             Console.WriteLine($"Suggestion: {GetSuggestions(totalPoints)}\n");
+            Console.WriteLine($"Please enter your PAI: [If you don't know, press enter]");
+            if(int.TryParse(Console.ReadLine(), out int pie) && pie > 0)
+            {
+                var pieArg = GetPAIArg(pie);
+                var bodyScore = pieArg * totalPoints;
+                Console.WriteLine($"Your final body score is: {bodyScore:N1}");
+                Console.WriteLine(GetBodySuggestions(bodyScore));
+            }
+
             Console.WriteLine($"Press [A] to add a record... Press [N] to quit.");
             var key = Console.ReadKey().Key.ToString().ToLower().Trim();
             if (key == "a")
@@ -77,6 +86,18 @@ namespace JAI
         static double WastePoint(double sourceWastedBefore)
         {
             return sourceWastedBefore / 2.0 - 5;
+        }
+
+        /// <summary>
+        /// PAI stands for Personal Activity Intelligence. You earn PAI points by elevating your heart rate. Anything that gets your body moving and your heart pumping counts (not just exercise and steps).  
+        /// Your personal PAI score is based on your heart rate data and your personal profile, including age, sex, and fitness level. PAI uses this data to give you one simple, personalized score.  
+        /// PAI's algorithm is based on data collected from the HUNT study, which took place over a 25-year period involving 45,000 participants. It was conducted by the Faculty of Medicine at the Norwegian University of Science and Technology and developed by Professor Ulrik Wisløff, one of the world’s leading scientists in Exercise in Medicine.
+        /// From this study, we were able to prove that you can live a longer, healthier life by maintaining a PAI score of 100 over a 7-day rolling period.
+        /// </summary>
+        static double GetPAIArg(int pie)
+        {
+            var y = (Math.Sqrt(pie) + 90) / 100;
+            return y;
         }
 
         static double AddScore(double sourceScore, double scoreToAdd)
@@ -122,6 +143,20 @@ namespace JAI
                 return "Please don't!! Your body is in a real bad status!";
             else if (currentScore >= 0)
                 return "Please DO NOT HURT YOUR BODY!!! You WILL get injured and feel extreamly unconfortable if you insists.";
+            else
+                throw new InvalidOperationException();
+        }
+
+        static string GetBodySuggestions(double currentBodyScore)
+        {
+            if (currentBodyScore >= 85)
+                return "Your body is ideal!!!";
+            else if (currentBodyScore >= 70)
+                return "Your body is good!!";
+            else if (currentBodyScore >= 47)
+                return "Your body is not good!";
+            else if (currentBodyScore >= 0)
+                return "Your body is very bad...";
             else
                 throw new InvalidOperationException();
         }
