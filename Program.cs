@@ -30,7 +30,7 @@ namespace JAI
 
                 // Since this is a triggered event. Count it!
                 var pointsLater = WastePoint(totalPoints);
-                Console.WriteLine($"Then with {totalPoints} points, you recorded at {record:MM-dd}, feels {GetStatus(totalPoints)}. You have {totalPoints / 2.0 - 5} points left and then feels {GetStatus(pointsLater)}.");
+                Console.WriteLine($"Then with {totalPoints:N1} points, you recorded at {record:MM-dd}, feels {GetStatus(totalPoints)}. You have {(totalPoints / 2.0 - 5):N1} points left and then feels {GetStatus(pointsLater)}.");
                 totalPoints = pointsLater;
                 Console.WriteLine($"...");
 
@@ -41,25 +41,40 @@ namespace JAI
             var finalElapsed = DateTime.Now - lastCalculatingPoint;
             var pointsLast = GetPointsFromWaitingTime(finalElapsed);
             totalPoints = AddScore(totalPoints, pointsLast);
-            Console.WriteLine($"...");
-            Console.WriteLine($"...");
+            Console.WriteLine($"------------------------------------------------");
+            Console.WriteLine($"\n");
             var feels = GetStatus(totalPoints);
+            Console.WriteLine($"Please enter your PAI: [If you don't know, press enter]");
+            int pai = 100;
+            var hasPai = int.TryParse(Console.ReadLine(), out pai);
+            Console.WriteLine($"------------------------------------------------\n\n\n");
             Console.WriteLine($"Your current point is:    {totalPoints:N1}.    Feels {feels}..");
             Console.WriteLine($"Suggestion: {GetSuggestions(totalPoints)}\n");
-            Console.WriteLine($"Please enter your PAI: [If you don't know, press enter]");
-            if(int.TryParse(Console.ReadLine(), out int pie) && pie > 0)
+            if(hasPai && pai > 0)
             {
-                var pieArg = GetPAIArg(pie);
+                var pieArg = GetPAIArg(pai);
                 var bodyScore = pieArg * totalPoints;
-                Console.WriteLine($"Your final body score is: {bodyScore:N1}");
                 Console.WriteLine(GetBodySuggestions(bodyScore));
+                Console.WriteLine($"------------------------------------------------");
             }
 
             Console.WriteLine($"Press [A] to add a record... Press [N] to quit.");
             var key = Console.ReadKey().Key.ToString().ToLower().Trim();
             if (key == "a")
             {
-                recordsObjects.Add(DateTime.Now);
+                var newRecordTime = DateTime.Now;
+                recordsObjects.Add(newRecordTime);
+
+                var elapsed = newRecordTime - lastCalculatingPoint;
+                var points = GetPointsFromWaitingTime(elapsed);
+                totalPoints = AddScore(totalPoints, points);
+
+                // Since this is a triggered event. Count it!
+                var pointsLater = WastePoint(totalPoints);
+                Console.WriteLine($"With {totalPoints:N1} points, you recorded at {newRecordTime:MM-dd}, feels {GetStatus(totalPoints)}. You have {(totalPoints / 2.0 - 5):N1} points left and then feels {GetStatus(pointsLater)}.");
+                totalPoints = pointsLater;
+                Console.WriteLine($"...");
+
             }
 
             var newList = recordsObjects.OrderBy(t => t).ToList();
@@ -96,7 +111,7 @@ namespace JAI
         /// </summary>
         static double GetPAIArg(int pie)
         {
-            var y = (Math.Sqrt(pie) + 90) / 100;
+            var y = Math.Sqrt(pie) / 10;
             return y;
         }
 
@@ -150,13 +165,13 @@ namespace JAI
         static string GetBodySuggestions(double currentBodyScore)
         {
             if (currentBodyScore >= 85)
-                return "Your body is ideal!!!";
+                return "Your body is ideal!!! Do anything you like!";
             else if (currentBodyScore >= 70)
-                return "Your body is good!!";
+                return "Your body is good!! Try to have fun!";
             else if (currentBodyScore >= 47)
-                return "Your body is not good!";
+                return "Your body is not good! Please try to do some basic exercies.";
             else if (currentBodyScore >= 0)
-                return "Your body is very bad...";
+                return "Your body is very very bad... Please consider recovery.";
             else
                 throw new InvalidOperationException();
         }
