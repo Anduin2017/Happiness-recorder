@@ -164,11 +164,11 @@ namespace JAI
 
         static string GetBodySuggestions(double currentBodyScore)
         {
-            if (currentBodyScore >= 85)
+            if (currentBodyScore >= 50)
                 return "Your body is ideal!!! Do anything you like!";
-            else if (currentBodyScore >= 70)
+            else if (currentBodyScore >= 40)
                 return "Your body is good!! Try to have fun!";
-            else if (currentBodyScore >= 47)
+            else if (currentBodyScore >= 28)
                 return "Your body is not good! Please try to do some basic exercies.";
             else if (currentBodyScore >= 0)
                 return "Your body is very very bad... Please consider recovery.";
